@@ -5,9 +5,12 @@ const taskService = require('../tasks/task.service');
 const getAll = () => usersRepo.getAll();
 
 const getUser = async id => {
-  const user = usersRepo.getUser(id);
-  if (!user) throw new createError.NotFound();
-  return user;
+  const user = await usersRepo.getUser(id);
+  if (!user) {
+    throw new createError.NotFound();
+  } else {
+    return user;
+  }
 };
 
 const addUser = user => {

@@ -15,7 +15,9 @@ const getAll = async () => {
 };
 
 const getUser = async id => {
-  return users.find(user => user.id === id);
+  const user = await users.find(el => el.id === id);
+  if (user === undefined) return false;
+  return user;
 };
 
 const addUser = async user => {
