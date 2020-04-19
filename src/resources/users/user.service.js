@@ -1,4 +1,6 @@
-const usersRepo = require('./user.memory.repository');
+// const usersRepo = require('./user.memory.repository');
+const usersRepo = require('./user.db.repository');
+
 const createError = require('http-errors');
 const taskService = require('../tasks/task.service');
 
@@ -6,11 +8,10 @@ const getAll = () => usersRepo.getAll();
 
 const getUser = async id => {
   const user = await usersRepo.getUser(id);
-  if (!user) {
-    throw new createError.NotFound();
-  } else {
+  if (user) {
     return user;
   }
+  throw new createError.NotFound();
 };
 
 const addUser = user => {
@@ -20,10 +21,13 @@ const addUser = user => {
   throw new createError.NotFound();
 };
 
-const updateUser = (user, body) => {
-  const newUser = { ...user, ...body };
-  usersRepo.updateUser(user, newUser);
-  return newUser;
+const updateUser = async body => {
+  if (!body.name || !body.login || !body.password) return;
+  const updatedUser = await usersRepo.updateUser(body);
+  if (updateUser) {
+    return updatedUser;
+  }
+  throw new createError.BadRequest();
 };
 
 const deleteUser = async id => {
@@ -31,7 +35,7 @@ const deleteUser = async id => {
   if (!result) {
     throw new createError.NotFound();
   } else {
-    await taskService.unassign(id);
+    await taskService.unassignTasks(id);
     return result;
   }
 };

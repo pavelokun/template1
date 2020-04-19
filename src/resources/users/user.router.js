@@ -9,7 +9,6 @@ router
     res.json(users.map(User.toResponse));
   })
   .post(async (req, res, next) => {
-    // validate
     try {
       const user = await usersService.addUser(req.body);
       res.status(200).json(User.toResponse(user));
@@ -23,15 +22,21 @@ router
   .get(async (req, res, next) => {
     try {
       const user = await usersService.getUser(req.params.id);
-      res.json(User.toResponse(user));
+      res.status(200).json(User.toResponse(user));
     } catch (error) {
       return next(error);
     }
   })
-  .put(async (req, res) => {
-    const user = await usersService.getUser(req.params.id);
-    const newUser = usersService.updateUser(user, req.body);
-    res.json(User.toResponse(newUser));
+  .put(async (req, res, next) => {
+    try {
+      const user = await usersService.updateUser({
+        ...req.body,
+        id: req.params.id
+      });
+      res.status(200).json(User.toResponse(user));
+    } catch (error) {
+      return next(error);
+    }
   })
   .delete(async (req, res, next) => {
     if (!req.params.id) res.status(400).send('Bad request');

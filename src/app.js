@@ -21,11 +21,11 @@ app.use('/', (req, res, next) => {
   next();
 });
 
-// Обработка uncaughtException и unhandledRejection - в server.js
-
 app.use((req, res, next) => {
-  const { originalUrl, query, body } = req;
-  logger.info({ originalUrl, query, body });
+  const { originalUrl, query, body, method } = req;
+  const q = JSON.stringify(query);
+  const b = JSON.stringify(body);
+  logger.info({ method, originalUrl, q, b });
   next();
 });
 

@@ -1,45 +1,42 @@
-const tasksRepo = require('./task.memory.repository');
-const Task = require('./task.model');
+const createError = require('http-errors');
+const tasksRepo = require('./task.db.repository');
 
-const getAll = async id => {
-  const tasks = await tasksRepo.getAll();
-  const filteredTasks = tasks.filter(task => task.boardId === id);
-  return filteredTasks;
+const addTask = async task => {
+  const createdTask = await tasksRepo.addTask(task);
+  if (createdTask) return createdTask;
+  throw new createError.BadRequest();
 };
 
-const getById = async (boardId, id) => {
-  const tasks = await getAll(boardId);
-  const task = tasks.find(item => item.id === id);
-  return task;
+const getAll = async boardId => {
+  return await tasksRepo.getAll(boardId);
 };
 
-const addTask = async (body, boardId) => {
-  const newTask = new Task({
-    ...body,
-    boardId
-  });
-  await tasksRepo.addTask(newTask);
-  return newTask;
+const getTask = async (boardId, taskId) => {
+  const task = await tasksRepo.getTask(boardId, taskId);
+  if (task) return task;
+  throw new createError.NotFound();
 };
 
-const updateTask = async (task, body) => {
-  const newTask = { ...task, ...body };
-  await tasksRepo.updateTask(task, newTask);
-  return newTask;
+const updateTask = async (boardId, taskId, task) => {
+  const updatedTask = await tasksRepo.updateTask(boardId, taskId, task);
+  if (updatedTask) return updatedTask;
+  throw new createError.BadRequest();
 };
 
-const unassign = id => tasksRepo.unassign(id);
+const deleteTask = async (boardId, taskId) => {
+  return await tasksRepo.deleteTask(boardId, taskId);
+};
 
-const deleteTasksById = id => tasksRepo.deleteTasksById(id);
+const unassignTasks = userId => tasksRepo.unassignTasks(userId);
 
-const deleteTask = async task => tasksRepo.deleteTask(task);
+const deleteTasks = boardId => tasksRepo.deleteTasks(boardId);
 
 module.exports = {
-  getAll,
   addTask,
-  getById,
+  getAll,
+  getTask,
   updateTask,
   deleteTask,
-  unassign,
-  deleteTasksById
+  unassignTasks,
+  deleteTasks
 };
