@@ -1,4 +1,5 @@
 // const usersRepo = require('./user.memory.repository');
+const bcrypt = require('bcrypt');
 const usersRepo = require('./user.db.repository');
 
 const createError = require('http-errors');
@@ -14,9 +15,11 @@ const getUser = async id => {
   throw new createError.NotFound();
 };
 
-const addUser = user => {
+const addUser = async user => {
   if (user) {
-    return usersRepo.addUser(user);
+    // eslint-disable-next-line no-sync
+    const passwordToSave = await bcrypt.hashSync(user.password, 10);
+    return usersRepo.addUser({ ...user, password: passwordToSave });
   }
   throw new createError.NotFound();
 };
@@ -40,4 +43,13 @@ const deleteUser = async id => {
   }
 };
 
-module.exports = { getAll, getUser, addUser, updateUser, deleteUser };
+const getUserByLogin = login => usersRepo.getUserByLogin(login);
+
+module.exports = {
+  getAll,
+  getUser,
+  addUser,
+  updateUser,
+  deleteUser,
+  getUserByLogin
+};

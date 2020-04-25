@@ -2,6 +2,8 @@ const express = require('express');
 const swaggerUI = require('swagger-ui-express');
 const path = require('path');
 const YAML = require('yamljs');
+const loginRouter = require('./resources/login/login.router');
+const authorization = require('./middleware/authorization');
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
 const taskRouter = require('./resources/tasks/task.router');
@@ -28,7 +30,8 @@ app.use((req, res, next) => {
   logger.info({ method, originalUrl, q, b });
   next();
 });
-
+app.use('/login', loginRouter);
+app.use(authorization);
 app.use('/users', userRouter);
 app.use('/boards', boardRouter);
 app.use('/boards', taskRouter);

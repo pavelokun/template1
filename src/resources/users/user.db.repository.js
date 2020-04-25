@@ -1,16 +1,10 @@
 const User = require('./user.model');
 
-const getAll = async () => {
-  return User.find({});
-};
+const getAll = async () => User.find({});
 
-const getUser = async id => {
-  return User.findById(id);
-};
+const getUser = async id => User.findById(id);
 
-const addUser = async user => {
-  return User.create(user);
-};
+const addUser = async user => User.create(user);
 
 const updateUser = async userToUpdate => {
   return (await User.updateOne({ _id: userToUpdate.id }, userToUpdate)).ok
@@ -18,14 +12,15 @@ const updateUser = async userToUpdate => {
     : null;
 };
 
-const deleteUser = async id => {
-  return (await User.deleteOne({ _id: id })).deletedCount;
-};
+const deleteUser = async id => (await User.deleteOne({ _id: id })).deletedCount;
+
+const getUserByLogin = async login => User.findOne({ login });
 
 module.exports = {
   getAll,
   getUser,
   addUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  getUserByLogin
 };
